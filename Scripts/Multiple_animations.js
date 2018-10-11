@@ -9,24 +9,29 @@ stork = null,
 group = null,
 orbitControls = null;
 loopAnimation = false;
-
+var spawner_copy=null
 var robot_mixer = {};
 var deadAnimator;
 var morphs = [];
-
+var mouse = new THREE.Vector2(), INTERSECTED, CLICKED;
+var raycaster=null;
 var duration = 2000; // ms
 var currentTime = Date.now();
-var deadMoment = null, moveMoment = null, move = true, stopAll = true;
+var deadMoment = null;
+var moveMoment = null;
+var MovementAnimator=null;
+var move = true;
+var stopAll = true;
 
 var animation = "idle";
 
-function changeAnimation(animation_text)
+function changeAnimation(animation_text, object)
 {
     animation = animation_text;
 
     if(animation =="dead")
     {
-        createDeadAnimation();
+        createDeadAnimation(object);
     }
     else
     {
@@ -35,10 +40,12 @@ function changeAnimation(animation_text)
     }
 }
 
-function createDeadAnimation()
+function createDeadAnimation(objeto)
 {
-     deadAnimator = new KF.KeyFrameAnimator;
-        deadAnimator.init({ 
+    console.log("Voy a animar a ", objeto);
+    console.log("anets era: ", robot_idle)
+     objeto.deadAnimator = new KF.KeyFrameAnimator;
+        objeto.deadAnimator.init({ 
             interps:
                 [
                     { 
@@ -48,7 +55,7 @@ function createDeadAnimation()
                                 { y : - Math.PI },
                                 { y : -2*Math.PI },
                                 ],
-                        target:robot_idle.rotation
+                        target:objeto.rotation
                     },
                     { 
                         keys:[0, 0.25, 0.5, 0.75, 1], 
@@ -59,24 +66,25 @@ function createDeadAnimation()
                                 { x : - 3*Math.PI/2 },
                                 { x : -2*Math.PI },
                                 ],
-                        target:robot_idle.rotation
+                        target:objeto.rotation
                     },
                     { 
                         keys:[0, 0.25, 0.5, 0.75, 1], 
                         values:[
-                                { y : robot_idle.position.y },
-                                { y : robot_idle.position.y - 4 },
-                                { y : robot_idle.position.y -8},
-                                { y : robot_idle.position.y-12 },
-                                { y : robot_idle.position.y-16 },
+                                { y : objeto.position.y },
+                                { y : objeto.position.y - 4 },
+                                { y : objeto.position.y -8},
+                                { y : objeto.position.y-12 },
+                                { y : objeto.position.y-16 },
                                 ],
-                        target:robot_idle.position
+                        target:objeto.position
                     },
                 ],
             loop: false,
             duration:duration
         });
-        deadAnimator.start();
+        console.log(objeto.deadAnimator)
+        objeto.deadAnimator.start();
 }
 
 function loadFBX()
@@ -94,9 +102,9 @@ function loadFBX()
             }
         } );
         robot_idle = object;
-        scene.add( robot_idle );
-        
-        createDeadAnimation();
+        //scene.add( robot_idle );
+        spawner_copy = robot_idle;
+       // createDeadAnimation(robot_idle);
 
         robot_mixer["idle"].clipAction( object.animations[ 0 ], robot_idle ).play();
 
@@ -130,22 +138,29 @@ function animate() {
      var now = Date.now();
     var deltat = now - currentTime;
     currentTime = now;
-
+    var newRobot=null;
     if(robot_idle && robot_mixer[animation])
     {
         // Move the robot
         if (move) {
             //let z = 
             //console.log(z);
-            robot_idle.position.x = Math.floor(Math.random() * 25) - 12.5;
-            robot_idle.position.z = 5 - Math.floor(Math.random() * 20);
-            scene.add(robot_idle);
+            var rand = Math.random()
+            var positionsX = []
+            console.log("Cloning dancer");
+            newRobot = cloneFbx(robot_idle);
+            newRobot.mixer =  new THREE.AnimationMixer( scene );
+            var action = newRobot.mixer.clipAction( newRobot.animations[0], newRobot );
+            action.play();
+            newRobot.position.x = Math.floor(Math.random() * 25) - 12.5;
+            newRobot.position.z = 5 - Math.floor(Math.random() * 20);
+            scene.add(newRobot);
             move = false;
             moveMoment = now;
             
         } else {
             if ((now - moveMoment) >= 2000) {
-                scene.remove(robot_idle);
+                scene.remove(newRobot);
                 move = true;
             }
         }
@@ -165,9 +180,9 @@ function animate() {
         robot_mixer["walk"].update(deltat * 0.001);
         //console.log(now - deadMoment);
         if ((now - deadMoment) >= duration / 10) {
-            scene.remove(robot_idle);
+            scene.remove(newRobot);
             animation = "idle";
-            robot_idle.rotation.x = 0;
+            newRobot.rotation.x = 0;
         }
     }
 }
@@ -180,11 +195,40 @@ function run() {
 
         // Spin the cube for next frame
         animate();
+        KF.update();
 
         // Update the camera controller
         orbitControls.update();
 }
+function onDocumentMouseDown(event)
+{
+    event.preventDefault();
+    event.preventDefault();
+    mouse.x = ( event.clientX / 800 ) * 2 - 1;
+    mouse.y = - ( event.clientY / 600 ) * 2 + 1;
 
+    // find intersections
+    raycaster.setFromCamera( mouse, camera );
+
+    var intersects = raycaster.intersectObjects( scene.children, true );
+
+    if ( intersects.length > 0 ) 
+    {
+        console.log("click");
+        CLICKED = intersects[ 0 ].object;
+        console.log(CLICKED.parent);
+        //CLICKED.material.emissive.setHex( 0x00ff00 );
+        createDeadAnimation(CLICKED.parent)
+        
+    } 
+    else 
+    {
+        if ( CLICKED ) 
+            CLICKED.material.emissive.setHex( CLICKED.currentHex );
+
+        CLICKED = null;
+    }
+}
 function setLightColor(light, r, g, b)
 {
     r /= 255;
@@ -205,6 +249,8 @@ function createScene(canvas) {
     
     // Create the Three.js renderer and attach it to our canvas
     renderer = new THREE.WebGLRenderer( { canvas: canvas, antialias: true } );
+    raycaster = new THREE.Raycaster();
+    document.addEventListener('mousedown', onDocumentMouseDown);
 
     // Set the viewport size
     renderer.setSize(canvas.width, canvas.height);
