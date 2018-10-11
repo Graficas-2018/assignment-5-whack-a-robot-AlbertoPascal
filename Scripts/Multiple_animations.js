@@ -41,12 +41,35 @@ function createDeadAnimation()
             interps:
                 [
                     { 
-                        keys:[0, 1], 
+                        keys:[0, 0.5, 1], 
+                        values:[
+                                { y : 0 },
+                                { y : - Math.PI },
+                                { y : -2*Math.PI },
+                                ],
+                        target:robot_idle.rotation
+                    },
+                    { 
+                        keys:[0, 0.25, 0.5, 0.75, 1], 
                         values:[
                                 { x : 0 },
                                 { x : - Math.PI / 2 },
+                                { x : - Math.PI },
+                                { x : - 3*Math.PI/2 },
+                                { x : -2*Math.PI },
                                 ],
                         target:robot_idle.rotation
+                    },
+                    { 
+                        keys:[0, 0.25, 0.5, 0.75, 1], 
+                        values:[
+                                { y : robot_idle.position.y },
+                                { y : robot_idle.position.y - 4 },
+                                { y : robot_idle.position.y -8},
+                                { y : robot_idle.position.y-12 },
+                                { y : robot_idle.position.y-16 },
+                                ],
+                        target:robot_idle.position
                     },
                 ],
             loop: false,
