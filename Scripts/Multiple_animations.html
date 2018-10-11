@@ -47,7 +47,15 @@ function initControls()
 	$(document).ready(
 			function() {
 
-				var canvas = document.getElementById("webglcanvas");
+				
+			}
+	);
+
+</script>
+<script>
+	function StartGame()
+	{
+		var canvas = document.getElementById("webglcanvas");
 
 				// create the scene
 				createScene(canvas);
@@ -57,29 +65,28 @@ function initControls()
 				
 		        // Run the run loop
 		        run();
-			}
-	);
 
+	}
 </script>
-
 </head>
 
 <body>
 
 <div id="container">
     <canvas id="webglcanvas" width=800 height=600></canvas>
-	<div id="title">Three.js Morph Targets</div>
+	<div id="title">No score yet</div>
+	<div id="title2">Time: 0 segs</div>
+
 </div>
 
 <div id="animations"> 
-	Animations
-	<form>
-		<input type="radio" name="animation" value="idle" checked id="idleradio">Idle<br> 
-		<input type="radio" name="animation" value="walk" id="walkradio">Walk<br> 
-		<input type="radio" name="animation" value="run" id="runradio">Run<br> 
-		<input type="radio" name="animation" value="attack" id="attackradio">Attack<br> 
-		<input type="radio" name="animation" value="dead" id="deadradio">Dead<br> 
-	</form>
+	<H1>Wack a Robot de Alberto Pascal</H1>
+	
+	
+	<div>
+		<button type="button" onclick= "StartGame()" name="button"> Start Game</button>
+		<button type="button" onclick="StartGame()" name="restartbutton"> Restart Game</button>
+	</div>
 </div> 
 
 

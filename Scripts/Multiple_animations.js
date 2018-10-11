@@ -22,7 +22,10 @@ var moveMoment = null;
 var MovementAnimator=null;
 var move = true;
 var stopAll = true;
-
+var score=0;
+var robots_array=[];
+var contador=0;
+var time_remaining=60;
 var animation = "idle";
 
 function changeAnimation(animation_text, object)
@@ -132,14 +135,18 @@ function loadFBX()
         } );
     } );
 }
-
+function GameTime()
+{
+    time_remaining-=1;
+    $('title2').text("Time: "+time+" segs");
+}
 function animate() {
 
-     var now = Date.now();
+    var now = Date.now();
     var deltat = now - currentTime;
     currentTime = now;
     var newRobot=null;
-    if(robot_idle && robot_mixer[animation])
+    if(newRobot==null)
     {
         // Move the robot
         if (move) {
@@ -147,20 +154,28 @@ function animate() {
             //console.log(z);
             var rand = Math.random()
             var positionsX = []
-            console.log("Cloning dancer");
             newRobot = cloneFbx(robot_idle);
+            console.log("voy a agregar un robotcitooo");
             newRobot.mixer =  new THREE.AnimationMixer( scene );
             var action = newRobot.mixer.clipAction( newRobot.animations[0], newRobot );
             action.play();
             newRobot.position.x = Math.floor(Math.random() * 25) - 12.5;
             newRobot.position.z = 5 - Math.floor(Math.random() * 20);
-            scene.add(newRobot);
+            robots_array.push(newRobot);
+           // console.log(robots_array.size());
+            contador+=1
+            scene.add(robots_array[contador-1]);
             move = false;
             moveMoment = now;
+
+
             
         } else {
-            if ((now - moveMoment) >= 2000) {
-                scene.remove(newRobot);
+            console.log("Toca matarlo")
+            if ((now - moveMoment) >= 3500) {
+                console.log("ya valió");
+                scene.remove(robots_array.pop(0));
+                contador-=1;
                 move = true;
             }
         }
@@ -191,14 +206,24 @@ function run() {
     requestAnimationFrame(function() { run(); });
     
         // Render the scene
-        renderer.render( scene, camera );
+       
 
         // Spin the cube for next frame
-        animate();
-        KF.update();
+        if(time_remaining>0)
+        {
+             renderer.render( scene, camera );
+             animate();
+             KF.update();
 
         // Update the camera controller
-        orbitControls.update();
+            orbitControls.update();
+        }
+       
+}
+function printScore(){
+  if (score < 0)
+    score = 0;
+  $('#title').text("Score: "+score);
 }
 function onDocumentMouseDown(event)
 {
@@ -209,13 +234,15 @@ function onDocumentMouseDown(event)
 
     // find intersections
     raycaster.setFromCamera( mouse, camera );
-
+    score = score + 10;
+    printScore();
     var intersects = raycaster.intersectObjects( scene.children, true );
 
     if ( intersects.length > 0 ) 
     {
         console.log("click");
         CLICKED = intersects[ 0 ].object;
+
         console.log(CLICKED.parent);
         //CLICKED.material.emissive.setHex( 0x00ff00 );
         createDeadAnimation(CLICKED.parent)
@@ -246,7 +273,8 @@ var mapUrl = "../images/checker_large.gif";
 var SHADOW_MAP_WIDTH = 2048, SHADOW_MAP_HEIGHT = 2048;
 
 function createScene(canvas) {
-    
+    time_remaining=60;
+    score=0;
     // Create the Three.js renderer and attach it to our canvas
     renderer = new THREE.WebGLRenderer( { canvas: canvas, antialias: true } );
     raycaster = new THREE.Raycaster();
@@ -292,7 +320,7 @@ function createScene(canvas) {
     
     // Create the objects
     loadFBX();
-
+    //scene.add(robot_idle);
     // Create a group to hold the objects
     group = new THREE.Object3D;
     root.add(group);
