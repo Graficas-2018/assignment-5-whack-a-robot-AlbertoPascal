@@ -16,6 +16,7 @@ var morphs = [];
 
 var duration = 2000; // ms
 var currentTime = Date.now();
+var deadMoment = null, moveMoment = null, move = true, stopAll = true;
 
 var animation = "idle";
 
@@ -126,20 +127,48 @@ function loadFBX()
 
 function animate() {
 
-    var now = Date.now();
+     var now = Date.now();
     var deltat = now - currentTime;
     currentTime = now;
 
     if(robot_idle && robot_mixer[animation])
     {
+        // Move the robot
+        if (move) {
+            //let z = 
+            //console.log(z);
+            robot_idle.position.x = Math.floor(Math.random() * 25) - 12.5;
+            robot_idle.position.z = 5 - Math.floor(Math.random() * 20);
+            scene.add(robot_idle);
+            move = false;
+            moveMoment = now;
+            
+        } else {
+            if ((now - moveMoment) >= 2000) {
+                scene.remove(robot_idle);
+                move = true;
+            }
+        }
+
         robot_mixer[animation].update(deltat * 0.001);
+        deadMoment = now;
     }
+
+   /* if(robot_idle && robot_mixer[animation])
+    {
+        robot_mixer[animation].update(deltat * 0.001);
+    }*/
 
     if(animation =="dead")
     {
-        robot_mixer[animation].update(deltat * 0.001);
-
         KF.update();
+        robot_mixer["walk"].update(deltat * 0.001);
+        //console.log(now - deadMoment);
+        if ((now - deadMoment) >= duration / 10) {
+            scene.remove(robot_idle);
+            animation = "idle";
+            robot_idle.rotation.x = 0;
+        }
     }
 }
 
