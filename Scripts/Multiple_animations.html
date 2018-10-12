@@ -56,7 +56,6 @@ function initControls()
 	function StartGame()
 	{
 		var canvas = document.getElementById("webglcanvas");
-
 				// create the scene
 				createScene(canvas);
 
@@ -67,7 +66,20 @@ function initControls()
 		        run();
 
 	}
+	function ResetScoreandTime()
+	{
+		Reset();
+// create the scene
+		createScene(canvas);
+
+				// initialize the controls
+		initControls();
+				
+		        // Run the run loop
+		run();
+	}
 </script>
+
 </head>
 
 <body>
@@ -85,7 +97,7 @@ function initControls()
 	
 	<div>
 		<button type="button" onclick= "StartGame()" name="button"> Start Game</button>
-		<button type="button" onclick="StartGame()" name="restartbutton"> Restart Game</button>
+		<button type="button" onclick="ResetScoreandTime()" name="restartbutton"> Restart Game</button>
 	</div>
 </div> 
 

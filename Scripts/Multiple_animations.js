@@ -32,6 +32,7 @@ function changeAnimation(animation_text, object)
 {
     animation = animation_text;
 
+
     if(animation =="dead")
     {
         createDeadAnimation(object);
@@ -45,6 +46,8 @@ function changeAnimation(animation_text, object)
 
 function createDeadAnimation(objeto)
 {
+    score = score + 10;
+    printScore();
     console.log("Voy a animar a ", objeto);
     console.log("anets era: ", robot_idle)
      objeto.deadAnimator = new KF.KeyFrameAnimator;
@@ -138,7 +141,7 @@ function loadFBX()
 function GameTime()
 {
     time_remaining-=1;
-    $('title2').text("Time: "+time+" segs");
+    $('     title2').text("Time: "+time+" segs");
 }
 function animate() {
 
@@ -220,6 +223,12 @@ function run() {
         }
        
 }
+function Reset()
+{
+    score=0;
+    time_remaining=60;
+    $('#title').text("Score: No score yet");
+}
 function printScore(){
   if (score < 0)
     score = 0;
@@ -234,8 +243,6 @@ function onDocumentMouseDown(event)
 
     // find intersections
     raycaster.setFromCamera( mouse, camera );
-    score = score + 10;
-    printScore();
     var intersects = raycaster.intersectObjects( scene.children, true );
 
     if ( intersects.length > 0 ) 
