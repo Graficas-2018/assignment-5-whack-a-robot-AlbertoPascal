@@ -55,6 +55,8 @@ function initControls()
 <script>
 	function StartGame()
 	{
+		var x = document.getElementsByName("button");
+		x[0].disabled=true;
 		var canvas = document.getElementById("webglcanvas");
 				// create the scene
 				createScene(canvas);

@@ -292,7 +292,7 @@ function onDocumentMouseDown(event)
 
         console.log(CLICKED.parent);
         //CLICKED.material.emissive.setHex( 0x00ff00 );
-        if(CLICKED.parent==tablero){
+        if(CLICKED.parent.name!="Robot0"){
 
         }
         else
