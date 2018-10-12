@@ -27,7 +27,7 @@ var robots_array=[];
 var contador=0;
 var time_remaining=60;
 var animation = "idle";
-
+var tablero=null;
 function changeAnimation(animation_text, object)
 {
     animation = animation_text;
@@ -46,9 +46,11 @@ function changeAnimation(animation_text, object)
 
 function createDeadAnimation(objeto)
 {
-    score = score + 10;
-    printScore();
-    console.log("Voy a animar a ", objeto);
+    if(time_remaining>0)
+    {
+        score = score + 10;
+        printScore();
+        console.log("Voy a animar a ", objeto);
     console.log("anets era: ", robot_idle)
      objeto.deadAnimator = new KF.KeyFrameAnimator;
         objeto.deadAnimator.init({ 
@@ -91,6 +93,8 @@ function createDeadAnimation(objeto)
         });
         console.log(objeto.deadAnimator)
         objeto.deadAnimator.start();
+    }
+    
 }
 
 function loadFBX()
@@ -141,7 +145,15 @@ function loadFBX()
 function GameTime()
 {
     time_remaining-=1;
-    $('     title2').text("Time: "+time+" segs");
+    if(time_remaining<=0)
+    {
+         $('#title3').text("G A M E   O V E R");
+    }
+    else
+    {
+        $('#title3').text("");
+    }
+    $('#title2').text("Time: "+time_remaining+" segs");
 }
 function animate() {
 
@@ -252,7 +264,13 @@ function onDocumentMouseDown(event)
 
         console.log(CLICKED.parent);
         //CLICKED.material.emissive.setHex( 0x00ff00 );
-        createDeadAnimation(CLICKED.parent)
+        if(CLICKED.parent==tablero){
+
+        }
+        else
+        {
+            createDeadAnimation(CLICKED.parent)
+        }
         
     } 
     else 
@@ -282,6 +300,7 @@ var SHADOW_MAP_WIDTH = 2048, SHADOW_MAP_HEIGHT = 2048;
 function createScene(canvas) {
     time_remaining=60;
     score=0;
+    setInterval(GameTime, 1000);
     // Create the Three.js renderer and attach it to our canvas
     renderer = new THREE.WebGLRenderer( { canvas: canvas, antialias: true } );
     raycaster = new THREE.Raycaster();
@@ -300,7 +319,7 @@ function createScene(canvas) {
 
     // Add  a camera so we can view the scene
     camera = new THREE.PerspectiveCamera( 45, canvas.width / canvas.height, 1, 4000 );
-    camera.position.set(-15, 6, 30);
+    camera.position.set(15, 15, 60);
     scene.add(camera);
 
     orbitControls = new THREE.OrbitControls(camera, renderer.domElement);
@@ -309,8 +328,8 @@ function createScene(canvas) {
     root = new THREE.Object3D;
     
     spotLight = new THREE.SpotLight (0xffffff);
-    spotLight.position.set(-30, 8, -10);
-    spotLight.target.position.set(-2, 0, -2);
+    spotLight.position.set(0, 50, 30);
+    spotLight.target.position.set(0, 0, 0);
     root.add(spotLight);
 
     spotLight.castShadow = true;
@@ -345,7 +364,7 @@ function createScene(canvas) {
 
     mesh.rotation.x = -Math.PI / 2;
     mesh.position.y = -4.02;
-    
+    tablero=mesh;
     // Add the mesh to our group
     group.add( mesh );
     mesh.castShadow = false;
