@@ -12,9 +12,10 @@
 }
 #title3 {
 	position:absolute;
-	left:100px;
-	top:120px;
+	left:150px;
+	top:30px;
 	font-size: 40px;
+	color:khaki;
 }
 #prompt {
 	position:absolute;
