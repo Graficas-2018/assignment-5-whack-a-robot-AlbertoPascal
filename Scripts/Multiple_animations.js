@@ -18,9 +18,9 @@ var raycaster=null;
 var duration = 2000; // ms
 var currentTime = Date.now();
 var deadMoment = null;
-var moveMoment = null;
+var deltaTime = null;
 var MovementAnimator=null;
-var move = true;
+var DontKillRobot = true;
 var stopAll = true;
 var score=0;
 var robots_array=[];
@@ -164,10 +164,10 @@ function animate() {
     var deltat = now - currentTime;
     currentTime = now;
     var newRobot=null;
-    if(newRobot==null)
+    if(contador<4)
     {
-        // Move the robot
-        if (move) {
+        // DontKillRobot the robot
+        if (DontKillRobot) {
             //let z = 
             //console.log(z);
             var rand = Math.random()
@@ -178,14 +178,14 @@ function animate() {
             newRobot.mixer =  new THREE.AnimationMixer( scene );
             var action = newRobot.mixer.clipAction( newRobot.animations[0], newRobot );
             action.play();
-            newRobot.position.x = Math.floor(Math.random() * 25) - 12.5;
-            newRobot.position.z = 5 - Math.floor(Math.random() * 20);
+            newRobot.position.x = Math.floor(Math.random() * 40) - Math.floor(Math.random() * 20);
+            newRobot.position.z = 5 - Math.floor(Math.random() * 40) - Math.floor(Math.random() * 30);
             robots_array.push(newRobot);
            // console.log(robots_array.size());
             contador+=1
             scene.add(robots_array[contador-1]);
-            move = false;
-            moveMoment = now;
+            DontKillRobot = false;
+            deltaTime = now;
 
             var loader = new THREE.FBXLoader();
             loader.load( '../models/Robot/robot_idle.fbx', function ( object ) 
@@ -215,11 +215,11 @@ function animate() {
             
         } else {
             console.log("Toca matarlo")
-            if ((now - moveMoment) >= 3500) {
+            if ((now - deltaTime) >= 3500) {
                 console.log("ya valió");
                 scene.remove(robots_array.pop(0));
                 contador-=1;
-                move = true;
+                DontKillRobot = true;
             }
         }
         animation="attack";
@@ -292,7 +292,7 @@ function onDocumentMouseDown(event)
 
         console.log(CLICKED.parent);
         //CLICKED.material.emissive.setHex( 0x00ff00 );
-        if(CLICKED.parent.name!="Robot0"){
+        if(CLICKED.parent.name!="Robot0" && CLICKED.parent.name!="Robot1" && CLICKED.parent.name!="Robot2" && CLICKED.parent.name!="Robot3" && CLICKED.parent.name!="Robot4"){
 
         }
         else
@@ -347,7 +347,7 @@ function createScene(canvas) {
 
     // Add  a camera so we can view the scene
     camera = new THREE.PerspectiveCamera( 45, canvas.width / canvas.height, 1, 4000 );
-    camera.position.set(15, 15, 60);
+    camera.position.set(-20, 30, 60);
     scene.add(camera);
 
     orbitControls = new THREE.OrbitControls(camera, renderer.domElement);
