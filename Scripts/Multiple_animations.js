@@ -24,7 +24,8 @@ var DontKillRobot = true;
 var stopAll = true;
 var score=0;
 var robots_array=[];
-var contador=0;
+var contador=0;     
+var suma_deltaT=0;
 var time_remaining=60;
 var animation = "idle";
 var tablero=null;
@@ -50,8 +51,8 @@ function createDeadAnimation(objeto)
     {
         score = score + 10;
         printScore();
-        console.log("Voy a animar a ", objeto);
-    console.log("anets era: ", robot_idle)
+       //console.log("Voy a animar a ", objeto);
+    //console.log("anets era: ", robot_idle)
      objeto.deadAnimator = new KF.KeyFrameAnimator;
         objeto.deadAnimator.init({ 
             interps:
@@ -91,7 +92,7 @@ function createDeadAnimation(objeto)
             loop: false,
             duration:duration
         });
-        console.log(objeto.deadAnimator)
+        //console.log(objeto.deadAnimator)
         objeto.deadAnimator.start();
     }
     
@@ -163,6 +164,7 @@ function animate() {
     var now = Date.now();
     var deltat = now - currentTime;
     currentTime = now;
+    suma_deltaT+=deltat;
     var newRobot=null;
     if(contador<4)
     {
@@ -174,7 +176,7 @@ function animate() {
             var positionsX = []
             newRobot = cloneFbx(robot_idle);
             newRobot.name="Robot" + contador;
-            console.log("voy a agregar un robotcitooo");
+            //console.log("voy a agregar un robotcitooo");
             newRobot.mixer =  new THREE.AnimationMixer( scene );
             var action = newRobot.mixer.clipAction( newRobot.animations[0], newRobot );
             action.play();
@@ -214,9 +216,9 @@ function animate() {
 
             
         } else {
-            console.log("Toca matarlo")
+            //console.log("Toca matarlo")
             if ((now - deltaTime) >= 3500) {
-                console.log("ya valió");
+              //  console.log("ya valió");
                 scene.remove(robots_array.pop(0));
                 contador-=1;
                 DontKillRobot = true;
@@ -287,10 +289,10 @@ function onDocumentMouseDown(event)
 
     if ( intersects.length > 0 ) 
     {
-        console.log("click");
+        //console.log("click");
         CLICKED = intersects[ 0 ].object;
 
-        console.log(CLICKED.parent);
+        //console.log(CLICKED.parent);
         //CLICKED.material.emissive.setHex( 0x00ff00 );
         if(CLICKED.parent.name!="Robot0" && CLICKED.parent.name!="Robot1" && CLICKED.parent.name!="Robot2" && CLICKED.parent.name!="Robot3" && CLICKED.parent.name!="Robot4"){
 
