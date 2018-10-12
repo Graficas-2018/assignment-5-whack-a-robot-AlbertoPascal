@@ -144,7 +144,10 @@ function loadFBX()
 }
 function GameTime()
 {
-    time_remaining-=1;
+    if(time_remaining>0)
+        {
+            time_remaining-=1;
+        }
     if(time_remaining<=0)
     {
          $('#title3').text("G A M E   O V E R");
@@ -170,6 +173,7 @@ function animate() {
             var rand = Math.random()
             var positionsX = []
             newRobot = cloneFbx(robot_idle);
+            newRobot.name="Robot" + contador;
             console.log("voy a agregar un robotcitooo");
             newRobot.mixer =  new THREE.AnimationMixer( scene );
             var action = newRobot.mixer.clipAction( newRobot.animations[0], newRobot );
@@ -183,6 +187,30 @@ function animate() {
             move = false;
             moveMoment = now;
 
+            var loader = new THREE.FBXLoader();
+            loader.load( '../models/Robot/robot_idle.fbx', function ( object ) 
+    {
+        robot_mixer["idle"] = new THREE.AnimationMixer( scene );
+        object.scale.set(0.02, 0.02, 0.02);
+        object.position.y -= 4;
+        object.traverse( function ( child ) {
+            if ( child.isMesh ) {
+                child.castShadow = true;
+                child.receiveShadow = true;
+            }
+        } );
+        
+
+        robot_mixer["idle"].clipAction( object.animations[ 0 ], robots_array[contador-1] ).play();
+
+        loader.load( '../models/Robot/robot_atk.fbx', function ( object ) 
+        {
+            robot_mixer["attack"] = new THREE.AnimationMixer( scene );
+            robot_mixer["attack"].clipAction( object.animations[ 0 ], robots_array[contador-1] ).play();
+        } );
+    } );
+    
+
 
             
         } else {
@@ -194,7 +222,7 @@ function animate() {
                 move = true;
             }
         }
-
+        animation="attack";
         robot_mixer[animation].update(deltat * 0.001);
         deadMoment = now;
     }
@@ -364,7 +392,9 @@ function createScene(canvas) {
 
     mesh.rotation.x = -Math.PI / 2;
     mesh.position.y = -4.02;
+    mesh.name="SoyTablero";
     tablero=mesh;
+    tablero.name="tablero";
     // Add the mesh to our group
     group.add( mesh );
     mesh.castShadow = false;
